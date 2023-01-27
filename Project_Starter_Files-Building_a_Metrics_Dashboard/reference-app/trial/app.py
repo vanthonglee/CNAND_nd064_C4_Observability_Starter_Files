@@ -20,6 +20,16 @@ metrics = PrometheusMetrics(app)
 # static information as metric
 metrics.info("app_info", "Application info", version="1.0.3")
 
+record_requests_by_status = metrics.summary('requests_by_status', 'Request latencies by status',
+                 labels={'status': lambda r: r.status_code})
+
+common_counter = metrics.counter(
+    'by_endpoint_counter', 'Request count by endpoints',
+    labels={'endpoint': lambda: request.endpoint}
+)
+
+historgram_status_path = metrics.histogram('requests_by_status_and_path', 'Request latencies by status and path', labels={'status': lambda r: r.status_code, 'path': lambda: request.path})
+
 logging.getLogger("").handlers = []
 logging.basicConfig(format="%(message)s", level=logging.DEBUG)
 logger = logging.getLogger(__name__)
@@ -47,11 +57,17 @@ flask_tracer = FlaskTracing(tracer, True, app)
 
 
 @app.route("/")
+@record_requests_by_status
+@common_counter
+@historgram_status_path
 def homepage():
     return render_template("main.html")
 
 
 @app.route("/trace")
+@record_requests_by_status
+@common_counter
+@historgram_status_path
 def trace():
     def remove_tags(text):
         tag = re.compile(r"<[^>]+>")
