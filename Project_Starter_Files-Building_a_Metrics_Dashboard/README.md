@@ -1,4 +1,5 @@
-**Note:** For the screenshots, you can store all of your answer images in the `answer-img` directory.
+## Architecture Overview
+![image](https://video.udacity-data.com/topher/2020/October/5f975a29_project-overview/project-overview.png)
 
 ## Verify the monitoring installation
 
